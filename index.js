@@ -1,0 +1,52 @@
+const express = require('express');
+const https = require('https');
+const cors = require('cors');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// CORS handling: allow *.vijaypathak.com.np
+app.use((req, res, next) => {
+  const origin = req.headers.origin || '';
+  const allowedDomain = /\.vijaypathak\.com\.np$/;
+
+  if (allowedDomain.test(new URL(origin).hostname)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+    return next();
+  }
+
+  res.status(403).json({ message: 'Forbidden: Origin not allowed' });
+});
+
+// Base64 URL path: /proxy/base64_encoded_data/
+app.get('/proxy/:b64', (req, res) => {
+  const base64Url = req.params.b64;
+
+  if (!base64Url) {
+    return res.status(400).json({ message: 'Missing Base64 URL in path' });
+  }
+
+  let decodedUrl;
+  try {
+    decodedUrl = Buffer.from(base64Url, 'base64').toString('utf8');
+  } catch (e) {
+    return res.status(400).json({ message: 'Invalid Base64 encoding' });
+  }
+
+  https.get(decodedUrl, { rejectUnauthorized: false }, (apiRes) => {
+    let data = '';
+    apiRes.on('data', chunk => data += chunk);
+    apiRes.on('end', () => {
+      res.setHeader('Content-Type', 'application/json');
+      res.send(data);
+    });
+  }).on('error', err => {
+    console.error("Proxy error:", err);
+    res.status(500).json({ message: 'Proxy request failed' });
+  });
+});
+
+app.listen(PORT, () => {
+  console.log(`Proxy running at http://localhost:${PORT}`);
+});
