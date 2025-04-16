@@ -4,23 +4,32 @@ const https = require('https');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Global CORS middleware
+// Strict Access Middleware: blocks unauthorized domains
 app.use((req, res, next) => {
   const origin = req.headers.origin || '';
-  const allowedPattern = /^([a-z0-9-]+\.)?vijaypathak\.com\.np$/i;
+  const referer = req.headers.referer || '';
+
+  const allowedPattern = /^([a-z0-9-]+\.)?vijaypathak\.com\.np$/i; // your domain here
+
+  let hostname = '';
 
   try {
-    const hostname = new URL(origin).hostname;
-    if (allowedPattern.test(hostname)) {
-      res.setHeader('Access-Control-Allow-Origin', origin); // Set exact origin
-      res.setHeader('Vary', 'Origin'); // CDN-safe
-    }
+    const sourceUrl = origin || referer;
+    hostname = new URL(sourceUrl).hostname;
   } catch (e) {
-    // Invalid Origin — silently skip
+    return res.status(403).json({ message: 'Access denied: invalid or missing Origin/Referer' });
   }
 
+  if (!allowedPattern.test(hostname)) {
+    return res.status(403).json({ message: 'Access denied: unauthorized domain' });
+  }
+
+  // Set CORS headers
+  res.setHeader('Access-Control-Allow-Origin', origin);
+  res.setHeader('Vary', 'Origin');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
   next();
 });
 
