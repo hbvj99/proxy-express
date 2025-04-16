@@ -4,20 +4,6 @@ const https = require('https');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// CORS handling: allow *.vijaypathak.com.np
-app.use((req, res, next) => {
-  const origin = req.headers.origin || '';
-  const allowedDomain = /\.vijaypathak\.com\.np$/;
-
-  if (allowedDomain.test(new URL(origin).hostname)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-    res.setHeader('Vary', 'Origin');
-    return next();
-  }
-
-  res.status(403).json({ message: 'Forbidden: Origin not allowed' });
-});
-
 // Base64 URL path: /proxy/base64_encoded_data/
 app.get('/proxy/:b64', (req, res) => {
   const base64Url = req.params.b64;
