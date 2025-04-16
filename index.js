@@ -7,16 +7,16 @@ const PORT = process.env.PORT || 3000;
 // Global CORS middleware
 app.use((req, res, next) => {
   const origin = req.headers.origin || '';
-  const allowedPattern = /^https:\/\/([a-z0-9-]+\.)?vijaypathak\.com\.np$/i; // set domain if required
+  const allowedPattern = /^([a-z0-9-]+\.)?vijaypathak\.com\.np$/i;
 
   try {
     const hostname = new URL(origin).hostname;
-    if (allowedPattern.test(origin)) {
-      res.setHeader('Access-Control-Allow-Origin', origin); // Dynamically allow matching domain
-      res.setHeader('Vary', 'Origin'); // Let CDNs vary by origin
+    if (allowedPattern.test(hostname)) {
+      res.setHeader('Access-Control-Allow-Origin', origin); // Set exact origin
+      res.setHeader('Vary', 'Origin'); // CDN-safe
     }
   } catch (e) {
-    // Invalid or missing origin — no CORS headers will be set
+    // Invalid Origin — silently skip
   }
 
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
