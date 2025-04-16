@@ -6,7 +6,19 @@ const PORT = process.env.PORT || 3000;
 
 // Global CORS middleware
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', 'vijaypathak.com.np'); // Change to your domain later if needed
+  const origin = req.headers.origin || '';
+  const allowedPattern = /^https:\/\/([a-z0-9-]+\.)?vijaypathak\.com\.np$/i; // set domain if required
+
+  try {
+    const hostname = new URL(origin).hostname;
+    if (allowedPattern.test(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin); // Dynamically allow matching domain
+      res.setHeader('Vary', 'Origin'); // Let CDNs vary by origin
+    }
+  } catch (e) {
+    // Invalid or missing origin — no CORS headers will be set
+  }
+
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   next();
