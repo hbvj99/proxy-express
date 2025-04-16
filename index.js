@@ -6,7 +6,7 @@ const PORT = process.env.PORT || 3000;
 
 // Global CORS middleware
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*.vijaypathak.com.np'); // Change to your domain later if needed
+  res.setHeader('Access-Control-Allow-Origin', 'vijaypathak.com.np'); // Change to your domain later if needed
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   next();
