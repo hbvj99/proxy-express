@@ -1,7 +1,7 @@
 {
-  "name": "pollution-proxy",
+  "name": "ssl-bypass-proxy",
   "version": "1.0.0",
-  "description": "Proxy to bypass invalid SSL cert and serve pollution.gov.np data",
+  "description": "Proxy to fetch ignoring SSL errors",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
